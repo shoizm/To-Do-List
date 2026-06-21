@@ -1,2 +1,2 @@
-# To-Do-List-
-simple to-do list written in c++
+# Simple To-Do-List-C++
+I'm a beginner so this code isn't really that complex, but enjoy using this as a reference
