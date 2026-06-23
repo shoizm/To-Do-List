@@ -1,14 +1,21 @@
+#include <fstream>
 #include <iostream>
 #include <ostream>
 #include <string>
 #include <vector>
 
-std::vector<std::string> List;
+struct Task {
+  std::string desc;
+  bool completed;
+};
 
-void addTask(std::vector<std::string> &List);
-void removeTask(std::vector<std::string> &List);
-void viewTask(std::vector<std::string> &List);
-void markTask(std::vector<std::string> &List);
+std::vector<Task> List;
+
+void addTask(std::vector<Task> &List);
+void removeTask(std::vector<Task> &List);
+void viewTask(std::vector<Task> &List);
+void markTask(std::vector<Task> &List);
+void saveTask(std::vector<Task> &List);
 
 int main() {
 
@@ -48,6 +55,7 @@ int main() {
       break;
 
     case 5:
+      saveTask(List);
       std::cout << "You have exited the To-Do List." << std::endl;
       std::cout << "--------------------\n" << std::endl;
       return 0;
@@ -55,15 +63,19 @@ int main() {
   }
 }
 
-void addTask(std::vector<std::string> &List) {
+void addTask(std::vector<Task> &List) {
+  Task addtask;
   std::string tasks;
 
-  std::cout << "Type to add a task:" << std::endl;
+  std::cout << "--------------------\n" << "Type to add a task:" << std::endl;
   std::getline(std::cin, tasks);
-  List.push_back(tasks);
+  addtask.desc = tasks;
+  addtask.completed = false;
+  List.push_back(addtask);
+  std::cout << "--------------------\n" << "Added task." << std::endl;
 }
 
-void removeTask(std::vector<std::string> &List) {
+void removeTask(std::vector<Task> &List) {
 
   if (List.empty()) {
     std::cout << "--------------------" << std::endl
@@ -71,9 +83,9 @@ void removeTask(std::vector<std::string> &List) {
     return;
   }
 
-  std::cout << "--------------------" << std::endl;
+  std::cout << "--------------------\n" << "TASKS:" << std::endl;
   for (int i = 0; i < List.size(); i++) {
-    std::cout << i + 1 << ". " << List[i] << std::endl;
+    std::cout << i + 1 << ". " << (List[i].desc) << std::endl;
   }
 
   std::cout << "--------------------" << std::endl
@@ -83,11 +95,12 @@ void removeTask(std::vector<std::string> &List) {
   int index = num - 1;
 
   List.erase(List.begin() + index);
-  std::cout << "Removed task #:" << num << std::endl;
+  std::cout << "--------------------\n"
+            << "Removed task #:" << num << std::endl;
   return;
 }
 
-void viewTask(std::vector<std::string> &List) {
+void viewTask(std::vector<Task> &List) {
 
   if (List.empty()) {
 
@@ -96,11 +109,49 @@ void viewTask(std::vector<std::string> &List) {
     return;
   }
 
-  std::cout << "--------------------" << std::endl;
+  std::cout << "--------------------\n" << "TASKS:" << std::endl;
 
   for (int i = 0; i < List.size(); i++) {
-    std::cout << i + 1 << ". " << List[i] << std::endl;
+    std::cout << i + 1 << ". "
+              << (List[i].completed ? "[Completed] " : "[Not Completed] ")
+              << List[i].desc << std::endl;
   }
 }
 
-void markTask(std::vector<std::string> &List) {}
+void markTask(std::vector<Task> &List) {
+
+  if (List.empty()) {
+    std::cout << "There are currently no tasks to mark as completed!"
+              << std::endl;
+    return;
+  }
+
+  std::cout << "--------------------\n" << "TASKS: " << std::endl;
+
+  for (int i = 0; i < List.size(); i++) {
+    std::cout << i + 1 << ". " << (List[i].desc)
+              << (List[i].completed ? "[Completed]" : "[Not Completed]")
+              << List[i].desc << std::endl;
+  }
+
+  std::cout << "Select a task from the list to mark as completed.\n"
+            << "--------------------" << std::endl;
+  int num;
+  std::cin >> num;
+  int i = num - 1;
+  List[i].completed = true;
+
+  std::cout << "--------------------\n"
+            << "Task: #" << num << " has been completed." << std::endl;
+}
+
+// ofstream not working well yet, will update tommorow
+
+void saveTask(std::vector<Task> &List) {
+
+  std::ofstream file("tasks.txt");
+  for (int i = 0; i < List.size(); i++) {
+    file << "#" << i + 1 << "" << List[i].completed << ": " << List[i].desc << std::endl;
+  }
+  file.close();
+}
