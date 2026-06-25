@@ -15,9 +15,11 @@ void addTask(std::vector<Task> &List);
 void removeTask(std::vector<Task> &List);
 void viewTask(std::vector<Task> &List);
 void markTask(std::vector<Task> &List);
+void loadTask(std::vector<Task> &List);
 void saveTask(std::vector<Task> &List);
 
 int main() {
+  loadTask(List);
 
   while (true) {
     std::cout << "--------------------" << std::endl;
@@ -76,7 +78,6 @@ void addTask(std::vector<Task> &List) {
 }
 
 void removeTask(std::vector<Task> &List) {
-
   if (List.empty()) {
     std::cout << "--------------------" << std::endl
               << "There is nothing to remove." << std::endl;
@@ -101,6 +102,7 @@ void removeTask(std::vector<Task> &List) {
 }
 
 void viewTask(std::vector<Task> &List) {
+  Task readtask;
 
   if (List.empty()) {
 
@@ -119,7 +121,6 @@ void viewTask(std::vector<Task> &List) {
 }
 
 void markTask(std::vector<Task> &List) {
-
   if (List.empty()) {
     std::cout << "There are currently no tasks to mark as completed!"
               << std::endl;
@@ -129,7 +130,7 @@ void markTask(std::vector<Task> &List) {
   std::cout << "--------------------\n" << "TASKS: " << std::endl;
 
   for (int i = 0; i < List.size(); i++) {
-    std::cout << i + 1 << ". " << (List[i].desc)
+    std::cout << i + 1 << ". "
               << (List[i].completed ? "[Completed]" : "[Not Completed]")
               << List[i].desc << std::endl;
   }
@@ -145,13 +146,33 @@ void markTask(std::vector<Task> &List) {
             << "Task: #" << num << " has been completed." << std::endl;
 }
 
-// ofstream not working well yet, will update tommorow
+void loadTask(std::vector<Task> &List) {
+  std::ifstream inputFile("tasks.txt");
+
+  if (!inputFile.is_open()) {
+    std::cout << "File could not open!" << std::endl;
+    return;
+  }
+
+  std::string tasks;
+  while (std::getline(inputFile, tasks)) {
+    int colonPos = tasks.find(':');
+    std::string taskCompleted = tasks.substr(0, colonPos);
+    std::string taskDescription = tasks.substr(colonPos + 1);
+
+    Task t;
+    t.completed = (taskCompleted == "1");
+    t.desc = taskDescription;
+    List.push_back(t);
+  }
+  inputFile.close();
+}
 
 void saveTask(std::vector<Task> &List) {
+  std::ofstream outputfile("tasks.txt");
 
-  std::ofstream file("tasks.txt");
   for (int i = 0; i < List.size(); i++) {
-    file << "#" << i + 1 << "" << List[i].completed << ": " << List[i].desc << std::endl;
+    outputfile << List[i].completed << ":" << List[i].desc << std::endl;
   }
-  file.close();
+  outputfile.close();
 }
